@@ -1,0 +1,6 @@
+- [X] login
+- [X] sendRPC
+- [ ] get status
+- [ ] set zoom/focus
+- [ ] tags ideia
+- [ ] 
