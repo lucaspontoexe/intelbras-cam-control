@@ -8,6 +8,7 @@ enum conn_status {
 
 type RPCRequest = {
   method: string;
+  // ideia: template param pra não usar unknown
   params: Record<string, unknown> | null;
 };
 
@@ -67,6 +68,7 @@ export class Camera {
     } catch (error) {
       console.error("[camera] login error\n", error);
       this.connectionStatus = conn_status.disconnected;
+      // TODO: se o erro não for EHOSTUNREACH, tentar de novo
       return;
     }
 
@@ -126,7 +128,34 @@ export class Camera {
     console.error("getFocusStatus not implemented");
   }
 
-  private sendRPC(data: RPCRequest) {
-    console.error("sendRPC not implemented");
+  async sendRPC(body: RPCRequest) {
+    if (this.connectionStatus == conn_status.disconnected) await this.login();
+    if (this.connectionStatus == conn_status.connecting) return;
+
+    let response;
+    try {
+      response = await fetch(this.host + "RPC2", {
+        headers: json_headers,
+        referrer: this.host,
+        body: JSON.stringify({
+          ...body,
+          id: ++this.requestID,
+          session: this.session,
+          cookie: this.cookie,
+        }),
+        method: "POST",
+      }).then((r) => r.json());
+    } catch (error) {
+      console.error("RPC error\n", error);
+    }
+
+    if (!response?.result) {
+      // câmera caiu
+      this.connectionStatus = conn_status.disconnected;
+      await this.login();
+      // debate: tentar repetir o request depois do login?
+    }
+
+    return response;
   }
 }
