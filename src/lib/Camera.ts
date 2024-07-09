@@ -126,6 +126,8 @@ export class Camera {
 
   getStatus() {
     console.error("getFocusStatus not implemented");
+    // ideia: usar getters/setters pra definir valores
+    // vai depender do front-end também
   }
 
   async sendRPC(body: RPCRequest) {
