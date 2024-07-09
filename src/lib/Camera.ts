@@ -6,6 +6,11 @@ enum conn_status {
   connected,
 }
 
+type RPCRequest = {
+  method: string;
+  params: Record<string, unknown> | null;
+};
+
 const json_headers = {
   accept: "application/json, text/javascript, */*; q=0.01",
   "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -121,7 +126,7 @@ export class Camera {
     console.error("getFocusStatus not implemented");
   }
 
-  private sendRPC(data: any) {
+  private sendRPC(data: RPCRequest) {
     console.error("sendRPC not implemented");
   }
 }
