@@ -1,3 +1,6 @@
+# intelbras cam zoom control
+(standalone agora vai edition) em desenvolvimento. muita hora nessa calma
+
 # Svelte + TS + Vite
 
 This template should help get you started developing with Svelte and TypeScript in Vite.
