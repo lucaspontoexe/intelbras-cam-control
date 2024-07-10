@@ -3,4 +3,5 @@
 - [ ] get status
 - [ ] set zoom/focus
 - [ ] tags ideia
-- [ ] 
+- [ ] frontend (????)
+- [ ] cors proxy
