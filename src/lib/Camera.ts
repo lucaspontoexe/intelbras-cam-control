@@ -37,6 +37,15 @@ export class Camera {
     this.password = password;
   }
 
+  async init() {
+    await this.login();
+    await this.sendRPC({ method: "devVideoInput.getFocusStatus", params: null })
+      .then((response) => {
+        this.zoom = response.params.status.Zoom;
+        this.focus = response.params.status.Focus;
+      });
+  }
+
   async login() {
     if (this.connectionStatus !== conn_status.disconnected) return;
     this.connectionStatus = conn_status.connecting;
@@ -81,7 +90,7 @@ export class Camera {
     const passwordHash = makeHash(
       this.username,
       params.random,
-      makeHash(this.username, params.realm, this.password)
+      makeHash(this.username, params.realm, this.password),
     );
 
     const login2 = await fetch(this.host + "RPC2_Login", {
@@ -101,7 +110,8 @@ export class Camera {
       }),
     }).then((r) => r.json());
 
-    this.cookie = `secure; DhWebClientSessionID=${this.session}; username=${this.username};`;
+    this.cookie =
+      `secure; DhWebClientSessionID=${this.session}; username=${this.username};`;
 
     await fetch(this.host + "RPC2_Notify_Method", {
       headers: {
@@ -121,7 +131,10 @@ export class Camera {
 
   private keepAlive() {
     // post keepalive
-    this.sendRPC({ method: "global.keepAlive", params: { timeout: 300, active: true } });
+    this.sendRPC({
+      method: "global.keepAlive",
+      params: { timeout: 300, active: true },
+    });
   }
 
   getStatus() {
