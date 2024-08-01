@@ -1,6 +1,7 @@
 import { md5 } from "js-md5";
 
 type conn_status = "disconnected" | "connecting" | "connected";
+type focus_status = "Normal" | "Autofocus";
 
 type RPCRequest = {
   method: string;
@@ -25,6 +26,8 @@ export class Camera {
 
   zoom = 0;
   focus = 0;
+  focusStatus: focus_status = "Normal";
+  private statusUpdateHandle = 0;
 
   constructor(host: string, username: string, password: string) {
     this.host = host;
@@ -168,4 +171,12 @@ export class Camera {
 
     return response;
   }
+
+  // connection status store
+
+  // set zoom
+
+  // zoom store
+
+  // focus store
 }
