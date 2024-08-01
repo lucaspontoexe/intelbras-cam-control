@@ -1,10 +1,6 @@
 import { md5 } from "js-md5";
 
-enum conn_status {
-  disconnected,
-  connecting,
-  connected,
-}
+type conn_status = "disconnected" | "connecting" | "connected";
 
 type RPCRequest = {
   method: string;
@@ -21,12 +17,11 @@ export class Camera {
   host: string;
   username: string;
   password: string;
+  connectionStatus: conn_status = "disconnected";
 
   private requestID = 0;
   private session = "";
   private cookie = "";
-
-  connectionStatus = conn_status.disconnected;
 
   zoom = 0;
   focus = 0;
@@ -47,8 +42,8 @@ export class Camera {
   }
 
   async login() {
-    if (this.connectionStatus !== conn_status.disconnected) return;
-    this.connectionStatus = conn_status.connecting;
+    if (this.connectionStatus !== "disconnected") return;
+    this.connectionStatus = "connecting";
     let params: { random: string; realm: string };
 
     try {
@@ -76,7 +71,7 @@ export class Camera {
       params = response.params;
     } catch (error) {
       console.error("[camera] login error\n", error);
-      this.connectionStatus = conn_status.disconnected;
+      this.connectionStatus = "disconnected";
       // TODO: se o erro não for EHOSTUNREACH, tentar de novo
       return;
     }
@@ -124,9 +119,9 @@ export class Camera {
       method: "GET",
     });
 
-    this.connectionStatus = conn_status.connected;
+    this.connectionStatus = "connected";
 
-    setInterval(this.keepAlive, 300 * 1000);
+    setInterval(this.keepAlive, 180 * 1000);
   }
 
   private keepAlive() {
@@ -144,8 +139,8 @@ export class Camera {
   }
 
   async sendRPC(body: RPCRequest) {
-    if (this.connectionStatus == conn_status.disconnected) await this.login();
-    if (this.connectionStatus == conn_status.connecting) return;
+    if (this.connectionStatus == "disconnected") await this.login();
+    if (this.connectionStatus == "connecting") return;
 
     let response;
     try {
@@ -166,7 +161,7 @@ export class Camera {
 
     if (!response?.result) {
       // câmera caiu
-      this.connectionStatus = conn_status.disconnected;
+      this.connectionStatus = "disconnected";
       await this.login();
       // debate: tentar repetir o request depois do login?
     }
